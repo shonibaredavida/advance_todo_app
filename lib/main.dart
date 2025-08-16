@@ -7,6 +7,7 @@ import 'package:adv_todo_app/controller/todo_controller.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  await HiveService.init();
 
   runApp(const MyApp());
 }
