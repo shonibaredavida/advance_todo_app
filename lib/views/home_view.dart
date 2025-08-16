@@ -44,13 +44,52 @@ class HomeView extends StatelessWidget {
         backgroundColor: Colors.indigo,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
         onPressed: () {
+          showAddTodoDialog(Get.context!, controller);
         },
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
   }
 
+  Widget _buildDropToTopLevelArea() {
+    return DragTarget<TodoModel>(
+      onWillAccept: (dragged) => true,
+      onAccept: (dragged) {
+        showDialog(
+          () {
+            controller.moveTodoToTopLevel(dragged.id);
+            Get.back();
+          },
+          titleString: 'Move Todo',
+          subTitleString: 'This will make this Sub-task a Main Task',
+        );
+      },
+      builder: (context, candidateData, rejectedData) {
         return AnimatedContainer(
+          duration: Duration(milliseconds: 200),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: candidateData.isNotEmpty
+                ? Colors.greenAccent.withOpacity(0.3)
+                : Colors.white,
+            border: Border.all(
+              color: candidateData.isNotEmpty
+                  ? Colors.green
+                  : Colors.grey[400]!,
+            ),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Center(
+            child: Text(
+              '⬆️ Drop here to make Top-level Task',
+              style: TextStyle(color: Colors.black54),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildTodoTile(TodoModel todo, {int depth = 0}) {
     final subTodos = todo.subTodoIds
         .map((id) => controller.todosMap[id])
@@ -64,7 +103,15 @@ class HomeView extends StatelessWidget {
         final isTargetTopLevel = todo.parentId == null;
 
         if (!_isDescendant(todo, draggedTodo) && isTargetTopLevel) {
+          showDialog(
+            () {
               controller.moveTodoToSub(draggedTodo.id, todo.id);
+              Get.back();
+            },
+            titleString: 'Move Todo',
+            subTitleString: 'This will make this Task a Sub-Task',
+          );
+        }
       },
       builder: (context, candidateData, rejectedData) {
         return Draggable<TodoModel>(
@@ -108,7 +155,11 @@ class HomeView extends StatelessWidget {
         children: [
           SlidableAction(
             onPressed: (context) {
+              showDialog(() {
                 controller.deleteTodoRecursive(todo.id);
+                Get.back();
+              });
+            },
             backgroundColor: Colors.redAccent,
             foregroundColor: Colors.white,
             icon: Icons.delete,
@@ -157,13 +208,33 @@ class HomeView extends StatelessWidget {
               leading: Checkbox(
                 value: todo.isDone,
                 onChanged: (_) {
+                  if (todo.parentId == null) {
+                    showDialog(
+                      () {
                         controller.toggleDone(todo.id);
+                        Get.back();
+                      },
+                      titleString: todo.isDone
+                          ? 'UnMark all Sub Tasks'
+                          : 'Mark all Sub Tasks',
+                      subTitleString: todo.isDone
+                          ? 'This will uncheck all sub Task'
+                          : 'This will check all sub Task as done',
+                    );
+                  } else {
+                    controller.toggleDone(todo.id);
+                  }
                 },
               ),
               trailing: todo.parentId == null
                   ? IconButton(
                       icon: const Icon(Icons.add, color: Colors.indigo),
                       tooltip: "Add Sub-Todo",
+                      onPressed: () => showAddTodoDialog(
+                        Get.context!,
+                        controller,
+                        parentId: todo.id,
+                      ),
                     )
                   : const SizedBox(),
             ),
@@ -193,3 +264,17 @@ class HomeView extends StatelessWidget {
   }
 }
 
+void showDialog(
+  fucntion, {
+  String titleString = "Delete Todoa",
+  String subTitleString = "Are you sure you want to delete this todo?",
+}) {
+  Get.defaultDialog(
+    title: titleString,
+    middleText: subTitleString,
+    textConfirm: "Yes",
+    textCancel: "No",
+    onConfirm: fucntion,
+    onCancel: () {},
+  );
+}
