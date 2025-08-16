@@ -9,6 +9,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Advanced Todo',
+      theme: ThemeData(
+        fontFamily: 'Poppins',
+        textTheme: const TextTheme(
+          bodyLarge: TextStyle(fontSize: 18),
+          bodyMedium: TextStyle(fontSize: 16),
+        ),
+      ),
       debugShowCheckedModeBanner: false,
       home: Container(),
     );
