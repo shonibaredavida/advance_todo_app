@@ -1,5 +1,13 @@
+import 'package:adv_todo_app/services/hive_service.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:adv_todo_app/controller/todo_controller.dart';
+
+
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+
   runApp(const MyApp());
 }
 
@@ -18,5 +26,10 @@ class MyApp extends StatelessWidget {
       ),
       debugShowCheckedModeBanner: false,
       home: Container(),
+      //HomeView(),
+      initialBinding: BindingsBuilder(() {
+        Get.put(TodoController());
+      }),
     );
   }
+}
