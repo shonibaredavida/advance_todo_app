@@ -206,6 +206,7 @@ class HomeView extends StatelessWidget {
                     ),
                 ],
               ),
+              leading: CheckBoxWidget(
                 value: todo.isDone,
                 onChange: (_) {
                   if (todo.parentId == null) {
