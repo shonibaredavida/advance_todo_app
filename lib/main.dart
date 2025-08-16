@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:adv_todo_app/controller/todo_controller.dart';
 
+import 'views/home_view.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: Container(),
       //HomeView(),
+      home: HomeView(),
       initialBinding: BindingsBuilder(() {
         Get.put(TodoController());
       }),
