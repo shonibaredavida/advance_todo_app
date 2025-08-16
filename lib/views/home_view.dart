@@ -1,5 +1,6 @@
 // ignore_for_file: deprecated_member_use
 
+import 'package:adv_todo_app/views/widgets/checkbox_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
@@ -205,9 +206,8 @@ class HomeView extends StatelessWidget {
                     ),
                 ],
               ),
-              leading: Checkbox(
                 value: todo.isDone,
-                onChanged: (_) {
+                onChange: (_) {
                   if (todo.parentId == null) {
                     showDialog(
                       () {
