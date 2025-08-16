@@ -27,8 +27,6 @@ class MyApp extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: Container(),
-      //HomeView(),
       home: HomeView(),
       initialBinding: BindingsBuilder(() {
         Get.put(TodoController());

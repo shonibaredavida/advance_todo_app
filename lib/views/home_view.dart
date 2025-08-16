@@ -15,6 +15,8 @@ class HomeView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF4F6F8),
+      appBar: AppBar(title: const Text(" Advanced Todo 📝")),
       body: Obx(() {
         final rootTodos = controller.todosMap.values
             .where((thisTodo) => thisTodo.parentId == null)
@@ -26,6 +28,13 @@ class HomeView extends StatelessWidget {
             children: [
               _buildDropToTopLevelArea(),
               const SizedBox(height: 10),
+              if (rootTodos.isEmpty)
+                Center(
+                  child: Text(
+                    "No todos added.",
+                    style: TextStyle(color: Colors.grey[600], fontSize: 16),
+                  ),
+                ),
               ...rootTodos.map((todo) => _buildTodoTile(todo)),
             ],
           ),
