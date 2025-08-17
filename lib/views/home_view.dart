@@ -17,14 +17,24 @@ class HomeView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6F8),
-      appBar: AppBar(title: const Text(" Advanced Todo 📝")),
+      appBar: AppBar(
+        backgroundColor: Colors.indigo,
+        title: Text(
+          " Advanced Todo 📝",
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
+        ),
+      ),
       body: Obx(() {
         final rootTodos = controller.todosMap.values
             .where((thisTodo) => thisTodo.parentId == null)
             .toList();
 
         return Padding(
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(15),
           child: ListView(
             children: [
               _buildDropToTopLevelArea(),
@@ -85,7 +95,7 @@ class HomeView extends StatelessWidget {
           child: const Center(
             child: Text(
               '⬆️ Drop here to make Top-level Task',
-              style: TextStyle(color: Colors.black54),
+              style: TextStyle(color: Colors.black54, fontSize: 14),
             ),
           ),
         );

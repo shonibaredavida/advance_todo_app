@@ -12,17 +12,23 @@ void showAddTodoDialog(
   showDialog(
     context: context,
     builder: (_) => AlertDialog(
-      title: Text(parentId == null ? "Add Todo" : "Add Sub-Todo"),
+      title: Text(
+        parentId == null ? "Add task" : "Add sub-task",
+        style: TextStyle(fontSize: 16),
+      ),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
             controller: titleCtrl,
-            decoration: const InputDecoration(hintText: "Title"),
+            decoration: const InputDecoration(hintText: "title"),
           ),
           TextField(
             controller: descCtrl,
-            decoration: const InputDecoration(hintText: "Description"),
+            decoration: const InputDecoration(
+              hintText: "description",
+              hintStyle: TextStyle(fontSize: 14),
+            ),
           ),
         ],
       ),
