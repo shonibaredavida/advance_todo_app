@@ -56,14 +56,16 @@ class HomeView extends StatelessWidget {
     return DragTarget<TodoModel>(
       onWillAccept: (dragged) => true,
       onAccept: (dragged) {
-        showDialog(
-          () {
-            controller.moveTodoToTopLevel(dragged.id);
-            Get.back();
-          },
-          titleString: 'Move Todo',
-          subTitleString: 'This will make this Sub-task a Main Task',
-        );
+        if (dragged.parentId != null) {
+          showDialog(
+            () {
+              controller.moveTodoToTopLevel(dragged.id);
+              Get.back();
+            },
+            titleString: 'Move Todo',
+            subTitleString: 'This will make this Sub-task a Main Task',
+          );
+        }
       },
       builder: (context, candidateData, rejectedData) {
         return AnimatedContainer(
@@ -102,8 +104,35 @@ class HomeView extends StatelessWidget {
       onWillAccept: (dragged) => dragged != null && dragged.id != todo.id,
       onAccept: (draggedTodo) {
         final isTargetTopLevel = todo.parentId == null;
+        if (draggedTodo.subTodoIds.isNotEmpty) {
+          Get.defaultDialog(
+            title: "Invalid Move",
+            titleStyle: const TextStyle(
+              color: Colors.red,
+              fontWeight: FontWeight.bold,
+              fontSize: 18,
+            ),
+            titlePadding: EdgeInsets.only(top: 20, bottom: 10),
+            middleText:
+                "You can't move a task that has sub-tasks into another task.\nOnly simple tasks can become sub-tasks.",
+            middleTextStyle: const TextStyle(fontSize: 14),
+            contentPadding: EdgeInsets.fromLTRB(20, 0, 20, 20),
+            backgroundColor: Colors.white,
+            confirm: SizedBox(
+              width: 120,
+              child: ElevatedButton(
+                onPressed: () => Get.back(),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                child: const Text("OK", style: TextStyle(color: Colors.white)),
+              ),
+            ),
+          );
+          return;
+        }
 
-        if (!_isDescendant(todo, draggedTodo) && isTargetTopLevel) {
+        if (!_isDescendant(todo, draggedTodo) &&
+            isTargetTopLevel &&
+            draggedTodo.subTodoIds.isEmpty) {
           showDialog(
             () {
               controller.moveTodoToSub(draggedTodo.id, todo.id);
@@ -156,10 +185,17 @@ class HomeView extends StatelessWidget {
         children: [
           SlidableAction(
             onPressed: (context) {
-              showDialog(() {
-                controller.deleteTodoRecursive(todo.id);
-                Get.back();
-              });
+              showDialog(
+                () {
+                  controller.deleteTodoRecursive(todo.id);
+
+                  Get.back();
+                },
+                subTitleString:
+                    todo.parentId == null && todo.subTodoIds.isNotEmpty
+                    ? 'this will delete the main task and its respective sub tasks\nAre you sure you want to delete this todo?'
+                    : 'Are you sure you want to delete this todo?',
+              );
             },
             backgroundColor: Colors.redAccent,
             foregroundColor: Colors.white,
@@ -209,18 +245,18 @@ class HomeView extends StatelessWidget {
               leading: CheckBoxWidget(
                 value: todo.isDone,
                 onChange: (_) {
-                  if (todo.parentId == null) {
+                  if (todo.parentId == null && todo.subTodoIds.isNotEmpty) {
                     showDialog(
                       () {
                         controller.toggleDone(todo.id);
                         Get.back();
                       },
                       titleString: todo.isDone
-                          ? 'UnMark all Sub Tasks'
-                          : 'Mark all Sub Tasks',
+                          ? 'Unmark all sub tasks'
+                          : 'Mark all sub-tasks',
                       subTitleString: todo.isDone
-                          ? 'This will uncheck all sub Task'
-                          : 'This will check all sub Task as done',
+                          ? 'This will uncheck all sub-task'
+                          : 'This will check all sub-task as done',
                     );
                   } else {
                     controller.toggleDone(todo.id);
@@ -267,13 +303,18 @@ class HomeView extends StatelessWidget {
 
 void showDialog(
   fucntion, {
-  String titleString = "Delete Todoa",
+  String titleString = "Delete Todo",
   String subTitleString = "Are you sure you want to delete this todo?",
 }) {
   Get.defaultDialog(
     title: titleString,
+    middleTextStyle: TextStyle(fontSize: 14),
+    titleStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
     middleText: subTitleString,
+
+    contentPadding: EdgeInsets.fromLTRB(20, 0, 20, 30),
     textConfirm: "Yes",
+    titlePadding: EdgeInsets.fromLTRB(30, 20, 30, 10),
     textCancel: "No",
     onConfirm: fucntion,
     onCancel: () {},
