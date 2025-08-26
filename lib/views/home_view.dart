@@ -222,7 +222,7 @@ class HomeView extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black12,
+              color: !isOutdated ? Colors.black12 : Colors.red,
               blurRadius: 2,
               offset: Offset(0, 2),
             ),
@@ -240,6 +240,8 @@ class HomeView extends StatelessWidget {
                   decoration: todo.isDone
                       ? TextDecoration.lineThrough
                       : TextDecoration.none,
+                  decorationColor: const Color.fromARGB(194, 197, 42, 31),
+                  decorationThickness: 4,
                 ),
               ),
               subtitle: Column(
@@ -248,7 +250,29 @@ class HomeView extends StatelessWidget {
                   if (todo.description?.isNotEmpty ?? false)
                     Text(
                       todo.description!,
-                      style: TextStyle(color: Colors.grey[700]),
+                      style: TextStyle(
+                        color: Colors.grey[700],
+                        decoration: todo.isDone
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
+                        decorationColor: Colors.grey,
+                        decorationThickness: 2,
+                      ),
+                    ),
+                  SizedBox(height: 4),
+                  if (todo.deadline != null)
+                    Text(
+                      "🗓  ${DateFormat.yMd().add_jm().format(todo.deadline!)}",
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 12,
+                        decoration: todo.isDone
+                            ? TextDecoration.lineThrough
+                            : TextDecoration.none,
+                        decorationColor: Colors.grey.withOpacity(0.5),
+                        decorationThickness: 2,
+                        decorationStyle: TextDecorationStyle.wavy,
+                      ),
                     ),
                 ],
               ),

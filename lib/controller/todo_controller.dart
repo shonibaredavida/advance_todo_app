@@ -125,6 +125,14 @@ class TodoController extends GetxController {
     }
   }
 
+  bool isOutdated(String id) {
+    final thisTodo = todosMap[id];
+    if (thisTodo!.deadline != null) {
+      return thisTodo.deadline!.isBefore(DateTime.now());
+    }
+    return false;
+  }
+
   deleteTodoRecursive(String id) {
     final thisTodo = todosMap[id];
     if (thisTodo == null) return;
