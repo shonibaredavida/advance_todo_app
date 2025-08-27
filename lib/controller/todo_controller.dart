@@ -1,10 +1,12 @@
+import 'dart:math';
 import 'package:adv_todo_app/models/todo_model.dart';
 import 'package:adv_todo_app/services/hive_service.dart';
+import 'package:adv_todo_app/services/notification_service.dart';
 import 'package:get/get.dart';
 
 class TodoController extends GetxController {
   final todosMap = <String, TodoModel>{}.obs;
-
+  final notificationService = NotificationService();
   @override
   void onInit() {
     super.onInit();
@@ -37,7 +39,8 @@ class TodoController extends GetxController {
     int? reminderMinutesBefore,
     String? parentId,
   }) {
-    final id = DateTime.now().millisecondsSinceEpoch.toString();
+    int suffix = Random().nextInt(100000);
+    final id = '${DateTime.now().microsecond}$suffix';
     final newTodo = TodoModel(
       id: id,
       title: title,
@@ -54,6 +57,16 @@ class TodoController extends GetxController {
         parent.subTodoIds = [...parent.subTodoIds, id];
       }
     }
+
+    if (deadline != null) {
+      NotificationService.showScheduledNotification(
+        id: int.parse(id),
+        title: title,
+        body: description ?? "Urgent Task",
+        dateTime: deadline,
+      );
+    }
+
     saveToHive();
     todosMap.refresh();
   }
@@ -133,13 +146,15 @@ class TodoController extends GetxController {
     return false;
   }
 
-  deleteTodoRecursive(String id) {
+  deleteTodoRecursive(String id) async {
     final thisTodo = todosMap[id];
     if (thisTodo == null) return;
     if (thisTodo.parentId != null) {
       final parent = todosMap[thisTodo.parentId!];
       if (parent != null) {
         parent.subTodoIds = parent.subTodoIds.where((e) => e != id).toList();
+        int notificationId = int.parse(id);
+        await NotificationService.cancelNotification(notificationId);
       }
     }
     for (var c in List<String>.from(thisTodo.subTodoIds)) {

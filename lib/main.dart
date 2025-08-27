@@ -1,4 +1,5 @@
 import 'package:adv_todo_app/services/hive_service.dart';
+import 'package:adv_todo_app/services/notification_service.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:adv_todo_app/controller/todo_controller.dart';
@@ -7,7 +8,7 @@ import 'views/home_view.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  await NotificationService.init();
   await HiveService.init();
 
   runApp(const MyApp());

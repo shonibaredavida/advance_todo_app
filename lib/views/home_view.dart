@@ -4,6 +4,7 @@ import 'package:adv_todo_app/views/widgets/checkbox_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import '../controller/todo_controller.dart';
 import '../models/todo_model.dart';
 import 'widgets/todo_dialog_prompt.dart';
@@ -19,8 +20,9 @@ class HomeView extends StatelessWidget {
       backgroundColor: const Color(0xFFF4F6F8),
       appBar: AppBar(
         backgroundColor: Colors.indigo,
+        centerTitle: true,
         title: Text(
-          " Advanced Todo 📝",
+          "Advanced Todo 📝",
           style: TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -188,6 +190,7 @@ class HomeView extends StatelessWidget {
     int depth,
     List<TodoModel> subTodos,
   ) {
+    final isOutdated = controller.isOutdated(todo.id);
     return Slidable(
       key: Key(todo.id),
       endActionPane: ActionPane(
