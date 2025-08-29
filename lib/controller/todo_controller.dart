@@ -71,6 +71,36 @@ class TodoController extends GetxController {
     todosMap.refresh();
   }
 
+  void editTodo(
+    String id, {
+    String? title,
+    String? description,
+    DateTime? deadline,
+  }) {
+    final currentTodo = todosMap[id];
+    int parsedId = int.parse(id);
+    //delete current schedule
+    if (currentTodo?.deadline != null) {
+      NotificationService.cancelNotification(parsedId);
+    }
+    if (currentTodo == null) return;
+    currentTodo.title = title ?? currentTodo.title;
+    currentTodo.description = description ?? currentTodo.description;
+    currentTodo.deadline = deadline;
+
+    // reschedule notification
+    if (deadline != null) {
+      NotificationService.showScheduledNotification(
+        id: parsedId,
+        title: currentTodo.title,
+        body: currentTodo.description ?? "Urgent Task",
+        dateTime: currentTodo.deadline as DateTime,
+      );
+    }
+    saveToHive();
+    todosMap.refresh();
+  }
+
   void moveTodoToSub(String draggedId, String newParentId) {
     final dragged = todosMap[draggedId];
     final newParent = todosMap[newParentId];
@@ -97,23 +127,6 @@ class TodoController extends GetxController {
       parent?.subTodoIds.remove(todoId);
       todo.parentId = null;
     }
-    saveToHive();
-    todosMap.refresh();
-  }
-
-  void editTodo(
-    String id, {
-    String? title,
-    String? description,
-    DateTime? deadline,
-    int? reminderMinutesBefore,
-  }) {
-    final currentTodo = todosMap[id];
-    if (currentTodo == null) return;
-    currentTodo.title = title ?? currentTodo.title;
-    currentTodo.description = description ?? currentTodo.description;
-    currentTodo.deadline = deadline;
-    currentTodo.reminderMinutesBefore = reminderMinutesBefore;
     saveToHive();
     todosMap.refresh();
   }
