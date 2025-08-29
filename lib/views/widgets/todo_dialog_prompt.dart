@@ -1,5 +1,6 @@
 import 'package:adv_todo_app/controller/add_todo_controller.dart';
 import 'package:adv_todo_app/controller/todo_controller.dart';
+import 'package:adv_todo_app/models/todo_model.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -8,10 +9,20 @@ void showAddTodoDialog(
   BuildContext context,
   TodoController controller, {
   String? parentId,
+  bool editMode = false,
+  TodoModel? todo,
 }) {
-  final titleCtrl = TextEditingController();
-  final descCtrl = TextEditingController();
+  final titleCtrl = editMode && todo != null
+      ? TextEditingController(text: todo.title)
+      : TextEditingController();
+  final descCtrl = editMode && todo?.description != null
+      ? TextEditingController(text: todo?.description)
+      : TextEditingController();
   final addController = Get.put(AddTodoDialogController());
+  if (editMode && todo?.deadline != null) {
+    addController.finalDeadline.value = todo?.deadline;
+  }
+
   Future<void> pickDeadline(BuildContext context) async {
     DateTime? selectedDate = await showDatePicker(
       context: context,
@@ -84,18 +95,34 @@ void showAddTodoDialog(
         ElevatedButton(
           onPressed: () {
             if (titleCtrl.text.trim().isNotEmpty) {
-              addController.finalDeadline.value == null
-                  ? controller.addTodo(
-                      title: titleCtrl.text.trim(),
-                      description: descCtrl.text.trim(),
-                      parentId: parentId,
-                    )
-                  : controller.addTodo(
-                      title: titleCtrl.text.trim(),
-                      description: descCtrl.text.trim(),
-                      parentId: parentId,
-                      deadline: addController.finalDeadline.value,
-                    );
+              if (editMode && todo != null) {
+                addController.finalDeadline.value == null
+                    ? controller.editTodo(
+                        todo.id.toString(),
+                        title: titleCtrl.text.trim(),
+                        description: descCtrl.text.trim(),
+                      )
+                    : controller.editTodo(
+                        todo.id.toString(),
+                        title: titleCtrl.text.trim(),
+                        description: descCtrl.text.trim(),
+                        deadline: addController.finalDeadline.value,
+                      );
+              } else {
+                addController.finalDeadline.value == null
+                    ? controller.addTodo(
+                        title: titleCtrl.text.trim(),
+                        description: descCtrl.text.trim(),
+                        parentId: parentId,
+                      )
+                    : controller.addTodo(
+                        title: titleCtrl.text.trim(),
+                        description: descCtrl.text.trim(),
+                        parentId: parentId,
+                        deadline: addController.finalDeadline.value,
+                      );
+              }
+              addController.finalDeadline.value = null;
               Get.back();
             }
           },

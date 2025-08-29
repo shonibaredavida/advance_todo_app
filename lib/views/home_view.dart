@@ -300,17 +300,33 @@ class HomeView extends StatelessWidget {
                   }
                 },
               ),
-              trailing: todo.parentId == null
-                  ? IconButton(
-                      icon: const Icon(Icons.add, color: Colors.indigo),
-                      tooltip: "Add Sub-Todo",
-                      onPressed: () => showAddTodoDialog(
-                        Get.context!,
-                        controller,
-                        parentId: todo.id,
-                      ),
-                    )
-                  : const SizedBox(),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.indigo),
+                    tooltip: "Edit this Todo",
+                    onPressed: () => showAddTodoDialog(
+                      Get.context!,
+                      controller,
+                      editMode: true,
+                      parentId: todo.id,
+                      todo: todo,
+                    ),
+                  ),
+                  todo.parentId == null
+                      ? IconButton(
+                          icon: const Icon(Icons.add, color: Colors.indigo),
+                          tooltip: "Add Sub-Todo",
+                          onPressed: () => showAddTodoDialog(
+                            Get.context!,
+                            controller,
+                            parentId: todo.id,
+                          ),
+                        )
+                      : const SizedBox(),
+                ],
+              ),
             ),
             if (subTodos.isNotEmpty)
               Padding(
